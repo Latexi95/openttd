@@ -15,7 +15,7 @@
 #include "core/bitmath_func.hpp"
 #include "road_type.h"
 #include "economy_func.h"
-
+#include "date_type.h"
 /**
  * Iterate through each set RoadType in a RoadTypes value.
  * For more informations see FOR_EACH_SET_BIT_EX.
@@ -172,7 +172,7 @@ static inline RoadBits AxisToRoadBits(Axis a)
 static inline Money RoadMaintenanceCost(RoadType roadtype, uint32 num)
 {
 	assert(IsValidRoadType(roadtype));
-	return (_price[PR_INFRASTRUCTURE_ROAD] * (roadtype == ROADTYPE_TRAM ? 3 : 2) * num * (1 + IntSqrt(num))) >> 9; // 2 bits fraction for the multiplier and 7 bits scaling.
+	return (SLOW_MULT * _price[PR_INFRASTRUCTURE_ROAD] * (roadtype == ROADTYPE_TRAM ? 3 : 2) * num * (1 + IntSqrt(num))) >> 9; // 2 bits fraction for the multiplier and 7 bits scaling.
 }
 
 bool HasRoadTypesAvail(const CompanyID company, const RoadTypes rts);

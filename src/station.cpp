@@ -566,6 +566,8 @@ Money AirportMaintenanceCost(Owner owner)
 			total_cost += _price[PR_INFRASTRUCTURE_AIRPORT] * st->airport.GetSpec()->maintenance_cost;
 		}
 	}
+	//LATEXI95
+	total_cost *= SLOW_MULT;
 	/* 3 bits fraction for the maintenance cost factor. */
 	return total_cost >> 3;
 }

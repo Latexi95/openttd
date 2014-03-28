@@ -929,8 +929,23 @@ void InitializeEconomy()
 Money GetPrice(Price index, uint cost_factor, const GRFFile *grf_file, int shift)
 {
 	if (index >= PR_END) return 0;
-
 	Money cost = _price[index] * cost_factor;
+
+	//LATEXI95
+	switch (index) {
+		case PR_RUNNING_TRAIN_STEAM:
+		case PR_RUNNING_TRAIN_DIESEL:
+		case PR_RUNNING_TRAIN_ELECTRIC:
+		case PR_RUNNING_AIRCRAFT:
+		case PR_RUNNING_ROADVEH:
+		case PR_RUNNING_SHIP:
+			cost *= SLOW_MULT;
+			printf("Cost after mutl: %u", cost);  
+			break;
+		default:
+			;
+	}
+
 	if (grf_file != NULL) shift += grf_file->price_base_multipliers[index];
 
 	if (shift >= 0) {
@@ -1094,6 +1109,8 @@ static Money DeliverGoods(int num_pieces, CargoID cargo_type, StationID dest, Ti
 		}
 	}
 
+	//LATEXI95
+	//profit /= SLOW_MULT;
 	return profit;
 }
 
@@ -1183,6 +1200,10 @@ void CargoPayment::PayFinalDelivery(const CargoPacket *cp, uint count)
 
 	/* Handle end of route payment */
 	Money profit = DeliverGoods(count, this->ct, this->current_station, cp->SourceStationXY(), cp->DaysInTransit(), this->owner, cp->SourceSubsidyType(), cp->SourceSubsidyID());
+
+	//LATEXI95
+	//profit /= SLOW_MULT;
+
 	this->route_profit += profit;
 
 	/* The vehicle's profit is whatever route profit there is minus feeder shares. */
@@ -1205,6 +1226,9 @@ Money CargoPayment::PayTransfer(const CargoPacket *cp, uint count)
 			this->ct);
 
 	profit = profit * _settings_game.economy.feeder_payment_share / 100;
+
+	//LATEXI95
+	//profit /= SLOW_MULT;
 
 	this->visual_transfer += profit; // accumulate transfer profits for whole vehicle
 	return profit; // account for the (virtual) profit already made for the cargo packet

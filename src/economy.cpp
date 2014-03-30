@@ -819,6 +819,10 @@ static void CompaniesPayInterest()
 		if (c->money < 0) {
 			yearly_fee += -c->money *_economy.interest_rate / 100;
 		}
+
+		//LATEXI95
+		yearly_fee *= SLOW_MULT * 6;
+
 		Money up_to_previous_month = yearly_fee * _cur_month / 12;
 		Money up_to_this_month = yearly_fee * (_cur_month + 1) / 12;
 
@@ -982,8 +986,8 @@ Money GetTransportedGoodsIncome(uint num_pieces, uint dist, byte transit_days, C
 		}
 	}
 
-	static const int MIN_TIME_FACTOR = 31;
-	static const int MAX_TIME_FACTOR = 255;
+	static const int MIN_TIME_FACTOR = 31; 
+	static const int MAX_TIME_FACTOR = 125; //LATEXI95, original 255
 
 	const int days1 = cs->transit_days[0];
 	const int days2 = cs->transit_days[1];
@@ -1202,6 +1206,10 @@ void CargoPayment::PayFinalDelivery(const CargoPacket *cp, uint count)
 	Money profit = DeliverGoods(count, this->ct, this->current_station, cp->SourceStationXY(), cp->DaysInTransit(), this->owner, cp->SourceSubsidyType(), cp->SourceSubsidyID());
 
 	//LATEXI95
+	if (this->ct == CT_PASSENGERS) {
+		profit = profit / 2;
+	}
+	//LATEXI95
 	//profit /= SLOW_MULT;
 
 	this->route_profit += profit;
@@ -1226,6 +1234,12 @@ Money CargoPayment::PayTransfer(const CargoPacket *cp, uint count)
 			this->ct);
 
 	profit = profit * _settings_game.economy.feeder_payment_share / 100;
+
+
+	//LATEXI95
+	if (this->ct == CT_PASSENGERS) {
+		profit = profit * 2 / 3;
+	}
 
 	//LATEXI95
 	//profit /= SLOW_MULT;
